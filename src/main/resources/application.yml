@@ -1,0 +1,20 @@
+godaddy:
+  url: https://api.godaddy.com/
+  debug: false
+ip:
+  amazon: http://checkip.amazonaws.com/
+  icanhazip: http://icanhazip.com/
+  ipify: https://api.ipify.org/
+
+dynamicdns:
+  enable: false
+  schedule: 600000 # min value in the TTL for godaddy
+  dnsName: '@'
+
+---
+
+spring:
+    profiles: test
+godaddy:
+  url: https://api.ote-godaddy.com/
+  debug: true

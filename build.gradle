@@ -1,0 +1,44 @@
+import io.swagger.codegen.ClientOptInput
+import io.swagger.codegen.ClientOpts
+import io.swagger.codegen.DefaultGenerator
+import io.swagger.codegen.languages.JavaClientCodegen
+import io.swagger.parser.SwaggerParser
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+
+buildscript {
+    dependencies {
+        classpath("io.swagger:swagger-codegen:2.1.6")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.3.RELEASE")
+    }
+}
+
+group = 'es.malvarez.godaddy'
+version = '1.0.0'
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+springBoot {
+    executable = true
+}
+
+bootRun {
+    systemProperties = System.properties
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter")
+    compile project(":api")
+}
+
+task buildSwagger {
+    def clientOptInput = new ClientOptInput()
+    def clientOpts = new ClientOpts()
+    clientOptInput.setConfig(new JavaClientCodegen())
+    clientOptInput.getConfig().setOutputDir("${projectDir}/api")
+    clientOptInput.opts(clientOpts).swagger(new SwaggerParser().read("https://api.ote-godaddy.com/doc/resources/v1/domains"))
+    new DefaultGenerator().opts(clientOptInput).generate()
+}
+tasks.buildSwagger.group = "build"
