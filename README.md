@@ -13,7 +13,7 @@ The library is a Spring Boot application so you can go to the [Spring Boot Docum
 All the utilities in the library require the usage of the Godaddy key and secret parameters:
  
 ```shell
-java -jar godaddy-wrapper-1.0.0.jar
+java -jar godaddy-wrapper.jar
     --godaddy.key=${KEY}
     --godaddy.secret=${SECRET}
 ```
@@ -26,7 +26,7 @@ java -jar godaddy-wrapper-1.0.0.jar
 To use the Dynamic DNS service the following parameters are needed as well:
 
 ```shell
-java -jar godaddy-wrapper-1.0.0.jar
+java -jar godaddy-wrapper.jar
     --dynamicdns.enable=true
     --dynamicdns.domain=${DOMAIN}
     --dynamicdns.dnsName=${DNS_NAME}    
