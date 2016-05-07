@@ -514,7 +514,7 @@ public class VdomainsApi {
     }
     
     // create path and map variables
-    String localVarPath = "/v1/domains/{domain}/records/{type?}/{name?}".replaceAll("\\{format\\}","json")
+    String localVarPath = "/v1/domains/{domain}/records/{type}/{name}".replaceAll("\\{format\\}","json")
       .replaceAll("\\{" + "domain" + "\\}", apiClient.escapeString(domain.toString()))
       .replaceAll("\\{" + "type" + "\\}", apiClient.escapeString(type.toString()))
       .replaceAll("\\{" + "name" + "\\}", apiClient.escapeString(name.toString()));
