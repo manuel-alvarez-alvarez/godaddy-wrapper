@@ -10,12 +10,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 public class GoDaddyWrapperApplication implements ApplicationRunner {
 
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(GoDaddyWrapperApplication.class, args);
+    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-    }
-
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(GoDaddyWrapperApplication.class, args);
     }
 }

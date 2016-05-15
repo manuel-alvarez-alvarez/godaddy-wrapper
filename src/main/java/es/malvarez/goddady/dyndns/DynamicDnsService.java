@@ -16,6 +16,8 @@ import javax.annotation.PostConstruct;
 import java.util.LinkedList;
 import java.util.List;
 
+import static io.swagger.client.model.DNSRecord.TypeEnum.*;
+
 @Service
 @ConditionalOnProperty(prefix = "dynamicdns", name = "enable", havingValue = "true")
 public class DynamicDnsService {
@@ -31,8 +33,9 @@ public class DynamicDnsService {
     @Autowired
     private DynamicDnsSettings settings;
 
-    private List<DNSRecord> nsDomainEntries;
     private DNSRecord aDomainEntry;
+    private List<DNSRecord> nsDomainEntries;
+    private List<DNSRecord> cnameDomainEntries;
 
     @PostConstruct
     public void setup() {
@@ -51,59 +54,34 @@ public class DynamicDnsService {
         }
     }
 
-    protected void fetchGodaddyIp() {
+    private void fetchGodaddyIp() {
         try {
-            List<DNSRecord> aRecord = vdomainsApi.recordGet(
-                    settings.getDomain(),
-                    DNSRecord.TypeEnum.A.toString(),
-                    settings.getDnsName(),
-                    null,
-                    null,
-                    null
-            );
+            List<DNSRecord> aRecord = vdomainsApi.recordGet(settings.getDomain(), A.toString(), settings.getDnsName(), null, null, null);
             if (aRecord.isEmpty()) {
                 throw new RuntimeException(
                         String.format(
                                 "Could not find any domain of type %s and name %s for the domain %s",
-                                DNSRecord.TypeEnum.A.toString(),
+                                A.toString(),
                                 settings.getDnsName(),
                                 settings.getDomain()
                         )
                 );
             }
             aDomainEntry = aRecord.get(0);
-
-            List<DNSRecord> nsRecords = vdomainsApi.recordGet(
-                    settings.getDomain(),
-                    DNSRecord.TypeEnum.NS.toString(),
-                    settings.getDnsName(),
-                    null,
-                    null,
-                    null
-            );
-            if (nsRecords.size() < 2) {
-                throw new RuntimeException(
-                        String.format(
-                                "Could not find any domain of type %s and name %s for the domain %s",
-                                DNSRecord.TypeEnum.NS.toString(),
-                                settings.getDnsName(),
-                                settings.getDomain()
-                        )
-                );
-            }
-            nsDomainEntries = nsRecords;
-
+            nsDomainEntries = vdomainsApi.recordGet(settings.getDomain(), NS.toString(), null, null, null, null);
+            cnameDomainEntries = vdomainsApi.recordGet(settings.getDomain(), CNAME.toString(), null, null, null, null);
         } catch (ApiException e) {
             throw new RuntimeException("Cannot get godaddy IP for domain " + settings.getDomain(), e);
         }
     }
 
-    protected void updateGodaddyIp(String newIp) {
+    private void updateGodaddyIp(String newIp) {
         try {
             aDomainEntry.setData(newIp);
             List<DNSRecord> entries = new LinkedList<>();
             entries.add(aDomainEntry);
             entries.addAll(nsDomainEntries);
+            entries.addAll(cnameDomainEntries);
             vdomainsApi.recordReplace(settings.getDomain(), entries, null);
         } catch (ApiException e) {
             throw new RuntimeException("Cannot update godaddy IP for domain " + settings.getDomain(), e);
