@@ -36,6 +36,8 @@ public class DynamicDnsService {
     private DNSRecord aDomainEntry;
     private List<DNSRecord> nsDomainEntries;
     private List<DNSRecord> cnameDomainEntries;
+    private List<DNSRecord> mxDomainEntries;
+    private List<DNSRecord> txtDomainEntries;
 
     @PostConstruct
     public void setup() {
@@ -70,6 +72,8 @@ public class DynamicDnsService {
             aDomainEntry = aRecord.get(0);
             nsDomainEntries = vdomainsApi.recordGet(settings.getDomain(), NS.toString(), null, null, null, null);
             cnameDomainEntries = vdomainsApi.recordGet(settings.getDomain(), CNAME.toString(), null, null, null, null);
+            mxDomainEntries = vdomainsApi.recordGet(settings.getDomain(), MX.toString(), null, null, null, null);
+            txtDomainEntries = vdomainsApi.recordGet(settings.getDomain(), TXT.toString(), null, null, null, null);
         } catch (ApiException e) {
             throw new RuntimeException("Cannot get godaddy IP for domain " + settings.getDomain(), e);
         }
@@ -82,6 +86,8 @@ public class DynamicDnsService {
             entries.add(aDomainEntry);
             entries.addAll(nsDomainEntries);
             entries.addAll(cnameDomainEntries);
+            entries.addAll(mxDomainEntries);
+            entries.addAll(txtDomainEntries);
             vdomainsApi.recordReplace(settings.getDomain(), entries, null);
         } catch (ApiException e) {
             throw new RuntimeException("Cannot update godaddy IP for domain " + settings.getDomain(), e);
